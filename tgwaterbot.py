@@ -3,6 +3,7 @@ import datetime
 import time
 import random
 
+bot = telebot.TeleBot("ваш токен")
 
 user_reminders = {}
 
