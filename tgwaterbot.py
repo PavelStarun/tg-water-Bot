@@ -3,7 +3,6 @@ import datetime
 import time
 import random
 
-bot = telebot.TeleBot("ваш токен")
 
 user_reminders = {}
 
@@ -31,24 +30,28 @@ def set_time(message):
         initial_time_str = message.text
         user_id = message.chat.id
         initial_time = datetime.datetime.strptime(initial_time_str, "%H:%M")
-        now = datetime.datetime.now()
 
-        if initial_time.time() < now.time():
-            next_time = (initial_time + datetime.timedelta(days=1)).strftime("%H:%M")
+        if initial_time.hour >= 22 or initial_time.hour < 8:
+            bot.reply_to(message, "Введено время в ночном режиме (с 22:00 до 8:00). Установка напоминаний в это время недоступна. Пожалуйста, выберите другое время.")
+            ask_for_time(message)
         else:
-            next_time = initial_time.strftime("%H:%M")
+            now = datetime.datetime.now()
+            if initial_time.time() < now.time():
+                next_time = initial_time + datetime.timedelta(days=1)
+            else:
+                next_time = initial_time
 
-        user_reminders[user_id] = {"initial_time": initial_time_str, "next_time": next_time}
-        bot.reply_to(message, f"Установлено время первого напоминания: {initial_time_str}. Следующее напоминание будет в {next_time}.")
+            next_time_str = next_time.strftime("%H:%M")
+            user_reminders[user_id] = {"initial_time": initial_time_str, "next_time": next_time_str}
+            bot.reply_to(message, f"Установлено время первого напоминания: {initial_time_str}. Следующее напоминание будет в {next_time_str}.")
 
     except ValueError:
         bot.reply_to(message, "Неверный формат времени. Попробуйте еще раз.")
         ask_for_time(message)
 
     except Exception as e:
-        bot.reply_to(message, "Что-то пошло не так. Попробуйте еще раз.")
+        bot.reply_to(message, f"Что-то пошло не так. Попробуйте еще раз. Ошибка: {e}")
         ask_for_time(message)
-
 
 def ask_for_time(message):
     msg = bot.reply_to(message, "Введите время первого напоминания в формате ЧЧ:ММ (например, 09:00):")
