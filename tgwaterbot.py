@@ -76,7 +76,7 @@ def start_message(message):
         next_time = now + datetime.timedelta(hours=next_hours_till_morning)
     next_time_str = next_time.strftime("%H:%M")
     user_reminders[user_id] = {"next_time": next_time_str}
-    bot.send_message(user_id, f"Следующее напоминание будет в {next_time_str}.\n /help - для получения помощи")
+    bot.send_message(user_id, f"Следующее напоминание будет в {next_time_str}.\nБот не будет вас беспокоить в период с 22:00 - 8:00(ночной режим).\n /help - для получения помощи")
 
 @bot.message_handler(commands=['help'])
 def help_message(message):
